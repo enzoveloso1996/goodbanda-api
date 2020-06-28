@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const Booking = require("../models/booking");
 
+
 //general get
 router.get('/', (req, res, next) => {
     Booking.find()
