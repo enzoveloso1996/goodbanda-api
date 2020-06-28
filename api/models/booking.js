@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const bookingSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    userId: [
+    user: [
       {type: mongoose.Types.ObjectId, ref: 'User', required: true}
     ],
     parcelWeight: { type: Number, required: false },
@@ -17,10 +17,10 @@ const bookingSchema = mongoose.Schema({
     dropoffAddress: { type: String, required: true },
     distance: { type: Number, required: false },
     rate: Number,
-    statusId: [
+    status: [
       {type: mongoose.Types.ObjectId, ref: 'Status', required: true}
     ],
-    riderId: [
+    rider: [
       {type: mongoose.Types.ObjectId, ref: 'Rider', required: true}
     ],
     receiverName: { type: String, required: true },

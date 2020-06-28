@@ -7,7 +7,7 @@ const RiderBooking = require("../models/riderBooking");
 //general get
 router.get('/', (req, res, next) => {
     RiderBooking.find()
-    .select("createdAt gemEarned deduction earned rate bookingId userId riderId _id")
+    .select("createdAt gemEarned deduction earned rate booking user rider _id")
     .exec()
     .then(docs => {
       const response = {
@@ -19,9 +19,9 @@ router.get('/', (req, res, next) => {
             deduction: doc.deduction,
             earned: doc.earned,
             rate: doc.rate,
-            bookingId: doc.bookingId,
-            userId: doc.userId,
-            riderId: doc.riderId,
+            booking: doc.booking,
+            user: doc.user,
+            rider: doc.rider,
             _id: doc._id,
             request: {
               type: "GET",
@@ -44,9 +44,9 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
     const riderBooking = new RiderBooking({
         _id: new mongoose.Types.ObjectId(),
-        riderId: req.body.riderId,
-        userId: req.body.userId,
-        bookingId: req.body.bookingId,
+        rider: req.body.riderId,
+        user: req.body.userId,
+        booking: req.body.bookingId,
         rate: req.body.rate,
         earned: req.body.earned,
         deduction: req.body.deduction,
@@ -73,7 +73,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderBookingId', (req, res, next) => {
     const id = req.params.riderBookingId;
     Booking.findById(id)
-    .select("createdAt gemEarned deduction earned rate bookingId userId riderId _id")
+    .select("createdAt gemEarned deduction earned rate booking user rider _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);

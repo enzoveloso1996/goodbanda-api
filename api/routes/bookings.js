@@ -7,7 +7,7 @@ const Booking = require("../models/booking");
 //general get
 router.get('/', (req, res, next) => {
     Booking.find()
-    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId _id")
+    .select("createdAt receiverContact receiverName rider status rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight user _id")
     .exec()
     .then(docs => {
       const response = {
@@ -17,8 +17,8 @@ router.get('/', (req, res, next) => {
             createdAt: doc.createdAt,
             receiverContact: doc.receiverContact,
             receiverName: doc.receiverName,
-            riderId: doc.riderId,
-            statusId: doc.statusId,
+            rider: doc.rider,
+            status: doc.status,
             rate: doc.rate,
             distance: doc.distance,
             dropoffAddress: doc.dropoffAddress,
@@ -30,7 +30,7 @@ router.get('/', (req, res, next) => {
             specialInstructions: doc.specialInstructions,
             parcelDesc: doc.parcelDesc,
             parcelWeight: doc.parcelWeight,
-            userId: doc.userId,
+            user: doc.user,
             _id: doc._id,
             request: {
               type: "GET",
@@ -53,7 +53,7 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
     const booking = new Booking({
         _id: new mongoose.Types.ObjectId(),
-        userId: req.body.userId,
+        user: req.body.userId,
         parcelWeight: req.body.parcelWeight,
         parcelDesc: req.body.parcelDesc,
         specialInstructions: req.body.specialInstructions,
@@ -65,8 +65,8 @@ router.post('/', (req, res, next) => {
         dropoffAddress: req.body.dropoffAddress,
         distance: req.body.distance,
         rate: req.body.rate,
-        statusId: req.body.statusId,
-        riderId: req.body.riderId,
+        status: req.body.statusId,
+        rider: req.body.riderId,
         receiverName: req.body.receiverName,
         receiverContact: req.body.receiverContact,
     });
@@ -91,7 +91,7 @@ router.post('/', (req, res, next) => {
 router.get('/:bookingId', (req, res, next) => {
     const id = req.params.bookingId;
     Booking.findById(id)
-    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId _id")
+    .select("createdAt receiverContact receiverName rider status rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight user _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);
