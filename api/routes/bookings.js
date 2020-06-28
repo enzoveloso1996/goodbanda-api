@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
+        bookings: docs.map(doc => {
           return {
             createdAt: doc.createdAt,
             receiverContact: doc.receiverContact,

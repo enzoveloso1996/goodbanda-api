@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
+        rates: docs.map(doc => {
           return {
             rate: doc.rate,
             km: doc.km,

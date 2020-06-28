@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
+        status: docs.map(doc => {
           return {
             status: doc.status,
             _id: doc._id,

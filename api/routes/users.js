@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
+        users: docs.map(doc => {
           return {
             createdAt: doc.createdAt,
             loadBalance: doc.loadBalance,

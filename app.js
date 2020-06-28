@@ -22,6 +22,8 @@ mongoose.connect(
   }
 );
 
+mongoose.Promise = global.Promise;
+
 //log requests
 app.use(morgan('dev'));
 

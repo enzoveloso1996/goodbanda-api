@@ -15,10 +15,10 @@ const bookingSchema = mongoose.Schema({
     distance: { type: Number, required: false },
     rate: Number,
     statusId: [
-      {type: mongoose.Types.ObjectId, ref: 'Status'}
+      {type: mongoose.Types.ObjectId, ref: 'Status', required: true}
     ],
     riderId: [
-      {type: mongoose.Types.ObjectId, ref: 'Rider'}
+      {type: mongoose.Types.ObjectId, ref: 'Rider', required: true}
     ],
     receiverName: { type: String, required: true },
     receiverContact: { type: String, required: true },
