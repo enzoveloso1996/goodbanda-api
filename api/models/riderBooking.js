@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const riderBookingSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
+    riderBookingId: mongoose.Schema.Types.ObjectId,
     riderId: [
       {type: mongoose.Types.ObjectId, ref: 'Rider'}
     ],
@@ -14,11 +14,16 @@ const riderBookingSchema = mongoose.Schema({
     pickupAddress: { type: String, required: true },
     dropoffAddress: { type: String, required: true },
     distance: { type: Number, required: false },
+    rate: Number,
+    earned: Number,
+    deduction: Number,
     statusId: [
       {type: mongoose.Types.ObjectId, ref: 'Status'}
     ],
     receiverName: { type: String, required: true },
-    receiverContact: { type: String, required: true }
+    receiverContact: { type: String, required: true },
+    gemEarned: Number,
+    createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('RiderBooking', riderBookingSchema);

@@ -7,27 +7,28 @@ const User = require("../models/user");
 //general get
 router.get('/', (req, res, next) => {
     User.find()
-    .select("loadBalance currentLong currentLat email contactNumber password userName lastName middleName firstName _id")
+    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName userId")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
         products: docs.map(doc => {
           return {
+            createdAt: doc.createdAt,
             loadBalance: doc.loadBalance,
             currentLong: doc.currentLong,
             currentLat: doc.currentLat,
             email: doc.email,
+            address: doc.address,
             contactNumber: doc.contactNumber,
             password: doc.password,
-            userName: doc.userName,
             lastName: doc.lastName,
             middleName: doc.middleName,
             firstName: doc.firstName,
-            _id: doc._id,
+            userId: doc.userId,
             request: {
               type: "GET",
-              url: "http://localhost:3000/users/" + doc._id
+              url: "http://localhost:3000/users/" + doc.userId
             }
           };
         })
@@ -45,14 +46,14 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const user = new User({
-        _id: new mongoose.Types.ObjectId(),
+        userId: new mongoose.Types.ObjectId(),
         firstName: req.body.firstName,
         middleName: req.body.middleName,
         lastName: req.body.lastName,
-        userName: req.body.userName,
         password: req.body.password,
         contactNumber: req.body.contactNumber,
         email: req.body.email,
+        address: req.body.address,
         currentLat: req.body.currentLat,
         currentLong: req.body.currentLong,
         loadBalance: req.body.loadBalance,
@@ -78,7 +79,7 @@ router.post('/', (req, res, next) => {
 router.get('/:userId', (req, res, next) => {
     const id = req.params.userId;
     User.findById(id)
-    .select("loadBalance currentLong currentLat email contactNumber password userName lastName middleName firstName _id")
+    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName userId")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -109,7 +110,7 @@ router.patch('/:userId', (req, res, next) => {
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value;
     }
-    User.update({ _id: id }, { $set: updateOps })
+    User.update({ userId: id }, { $set: updateOps })
         .exec()
         .then(result => {
         res.status(200).json({
@@ -130,7 +131,7 @@ router.patch('/:userId', (req, res, next) => {
 
 //delete
 router.delete('/:userId', (req, res, next) => {
-    User.remove({ _id: id })
+    User.remove({ userId: id })
     .exec()
     .then(result => {
       res.status(200).json({

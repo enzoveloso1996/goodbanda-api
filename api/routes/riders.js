@@ -7,13 +7,14 @@ const Rider = require("../models/rider");
 //general get
 router.get('/', (req, res, next) => {
     Rider.find()
-    .select("gems contactNumber loadBalance currentLong currentLat isAvailable email password userName lastName middleName firstName _id")
+    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName riderId")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
         products: docs.map(doc => {
           return {
+            createdAt: doc.createdAt,
             gems: doc.gems,
             contactNumber: doc.contactNumber,
             loadBalance: doc.loadBalance,
@@ -21,15 +22,15 @@ router.get('/', (req, res, next) => {
             currentLat: doc.currentLat,
             isAvailable: doc.isAvailable,
             email: doc.email,
+            address: doc.address,
             password: doc.password,
-            userName: doc.userName,
             lastName: doc.lastName,
             middleName: doc.middleName,
             firstName: doc.firstName,
-            _id: doc._id,
+            riderId: doc.riderId,
             request: {
               type: "GET",
-              url: "http://localhost:3000/riders/" + doc._id
+              url: "http://localhost:3000/riders/" + doc.riderId
             }
           };
         })
@@ -47,19 +48,19 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const rider = new Rider({
-        _id: new mongoose.Types.ObjectId(),
+        riderId: new mongoose.Types.ObjectId(),
         firstName: req.body.firstName,
         middleName: req.body.middleName,
         lastName: req.body.lastName,
-        userName: req.body.userName,
         password: req.body.password,
         email: req.body.email,
+        address: req.body.address,
         isAvailable: req.body.isAvailable,
         currentLat: req.body.currentLat,
         currentLong: req.body.currentLong,
         loadBalance: req.body.loadBalance,
         contactNumber: req.body.loadBalance,
-        gems: req.body.gems
+        gems: req.body.gems,
     });
     rider
     .save()
@@ -82,7 +83,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderId', (req, res, next) => {
     const id = req.params.riderId;
     Rider.findById(id)
-    .select("gems contactNumber loadBalance currentLong currentLat isAvailable email password userName lastName middleName firstName _id")
+    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName riderId")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -113,7 +114,7 @@ router.patch('/:riderId', (req, res, next) => {
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value;
     }
-    Rider.update({ _id: id }, { $set: updateOps })
+    Rider.update({ riderId: id }, { $set: updateOps })
         .exec()
         .then(result => {
         res.status(200).json({
@@ -134,7 +135,7 @@ router.patch('/:riderId', (req, res, next) => {
 
 //delete
 router.delete('/:riderId', (req, res, next) => {
-    Rider.remove({ _id: id })
+    Rider.remove({ riderId: id })
     .exec()
     .then(result => {
       res.status(200).json({

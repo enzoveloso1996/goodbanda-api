@@ -7,16 +7,21 @@ const RiderBooking = require("../models/riderBooking");
 //general get
 router.get('/', (req, res, next) => {
     RiderBooking.find()
-    .select("receiverContact receiverName statusId distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId _id")
+    .select("createdAt gemEarned receiverContact receiverName statusId deduction earned rate distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId riderBookingId")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
         products: docs.map(doc => {
           return {
+            createdAt: doc.createdAt,
+            gemEarned: doc.gemEarned,
             receiverContact: doc.receiverContact,
             receiverName: doc.receiverName,
             statusId: doc.statusId,
+            deduction: doc.deduction,
+            earned: doc.earned,
+            rate: doc.rate,
             distance: doc.distance,
             dropoffAddress: doc.dropoffAddress,
             pickupAddress: doc.pickupAddress,
@@ -24,10 +29,10 @@ router.get('/', (req, res, next) => {
             parcelWeight: doc.parcelWeight,
             userId: doc.userId,
             riderId: doc.riderId,
-            _id: doc._id,
+            riderBookingId: doc.riderBookingId,
             request: {
               type: "GET",
-              url: "http://localhost:3000/riderBooking/" + doc._id
+              url: "http://localhost:3000/riderBooking/" + doc.riderBookingId
             }
           };
         })
@@ -45,7 +50,7 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const riderBooking = new RiderBooking({
-        _id: new mongoose.Types.ObjectId(),
+        riderBookingId: new mongoose.Types.ObjectId(),
         riderId: req.body.riderId,
         userId: req.body.userId,
         parcelWeight: req.body.parcelWeight,
@@ -53,9 +58,13 @@ router.post('/', (req, res, next) => {
         pickupAddress: req.body.pickupAddress,
         dropoffAddress: req.body.dropoffAddress,
         distance: req.body.distance,
+        rate: req.body.rate,
+        earned: req.body.earned,
+        deduction: req.body.deduction,
         statusId: req.body.statusId,
         receiverName: req.body.receiverName,
         receiverContact: req.body.receiverContact,
+        gemEarned: req.body.gemEarned
     });
     riderBooking
     .save()
@@ -78,7 +87,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderBookingId', (req, res, next) => {
     const id = req.params.riderBookingId;
     Booking.findById(id)
-    .select("receiverContact receiverName statusId distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId _id")
+    .select("createdAt gemEarned receiverContact receiverName statusId deduction earned rate distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId riderBookingId")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -109,7 +118,7 @@ router.patch('/:riderBookingId', (req, res, next) => {
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value;
     }
-    RiderBooking.update({ _id: id }, { $set: updateOps })
+    RiderBooking.update({ riderBookingId: id }, { $set: updateOps })
         .exec()
         .then(result => {
         res.status(200).json({
@@ -130,7 +139,7 @@ router.patch('/:riderBookingId', (req, res, next) => {
 
 //delete
 router.delete('/:riderBookingId', (req, res, next) => {
-    RiderBooking.remove({ _id: id })
+    RiderBooking.remove({ riderBookingId: id })
     .exec()
     .then(result => {
       res.status(200).json({
