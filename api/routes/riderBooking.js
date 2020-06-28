@@ -7,7 +7,7 @@ const RiderBooking = require("../models/riderBooking");
 //general get
 router.get('/', (req, res, next) => {
     RiderBooking.find()
-    .select("createdAt gemEarned receiverContact receiverName statusId deduction earned rate distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId riderBookingId")
+    .select("createdAt gemEarned deduction earned rate bookingId userId riderId _id")
     .exec()
     .then(docs => {
       const response = {
@@ -16,23 +16,16 @@ router.get('/', (req, res, next) => {
           return {
             createdAt: doc.createdAt,
             gemEarned: doc.gemEarned,
-            receiverContact: doc.receiverContact,
-            receiverName: doc.receiverName,
-            statusId: doc.statusId,
             deduction: doc.deduction,
             earned: doc.earned,
             rate: doc.rate,
-            distance: doc.distance,
-            dropoffAddress: doc.dropoffAddress,
-            pickupAddress: doc.pickupAddress,
-            parcelDesc: doc.parcelDesc,
-            parcelWeight: doc.parcelWeight,
+            bookingId: doc.bookingId,
             userId: doc.userId,
             riderId: doc.riderId,
-            riderBookingId: doc.riderBookingId,
+            _id: doc._id,
             request: {
               type: "GET",
-              url: "http://localhost:3000/riderBooking/" + doc.riderBookingId
+              url: "http://localhost:3000/riderBooking/" + doc._id
             }
           };
         })
@@ -50,20 +43,13 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const riderBooking = new RiderBooking({
-        riderBookingId: new mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         riderId: req.body.riderId,
         userId: req.body.userId,
-        parcelWeight: req.body.parcelWeight,
-        parcelDesc: req.body.parcelDesc,
-        pickupAddress: req.body.pickupAddress,
-        dropoffAddress: req.body.dropoffAddress,
-        distance: req.body.distance,
+        bookingId: req.body.bookingId,
         rate: req.body.rate,
         earned: req.body.earned,
         deduction: req.body.deduction,
-        statusId: req.body.statusId,
-        receiverName: req.body.receiverName,
-        receiverContact: req.body.receiverContact,
         gemEarned: req.body.gemEarned
     });
     riderBooking
@@ -87,7 +73,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderBookingId', (req, res, next) => {
     const id = req.params.riderBookingId;
     Booking.findById(id)
-    .select("createdAt gemEarned receiverContact receiverName statusId deduction earned rate distance dropoffAddress pickupAddress parcelDesc parcelWeight userId riderId riderBookingId")
+    .select("createdAt gemEarned deduction earned rate bookingId userId riderId _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -114,11 +100,7 @@ router.get('/:riderBookingId', (req, res, next) => {
 //update
 router.patch('/:riderBookingId', (req, res, next) => {
     const id = req.params.riderBookingId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    RiderBooking.update({ riderBookingId: id }, { $set: updateOps })
+    RiderBooking.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -139,7 +121,8 @@ router.patch('/:riderBookingId', (req, res, next) => {
 
 //delete
 router.delete('/:riderBookingId', (req, res, next) => {
-    RiderBooking.remove({ riderBookingId: id })
+  const id = req.params.riderBookingId;
+    RiderBooking.remove({ _id: id })
     .exec()
     .then(result => {
       res.status(200).json({

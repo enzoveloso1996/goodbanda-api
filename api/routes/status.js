@@ -87,11 +87,7 @@ router.get('/:statusId', (req, res, next) => {
 //update
 router.patch('/:statusId', (req, res, next) => {
     const id = req.params.statusId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    Status.update({ _id: id }, { $set: updateOps })
+    Status.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -112,6 +108,7 @@ router.patch('/:statusId', (req, res, next) => {
 
 //delete
 router.delete('/:statusId', (req, res, next) => {
+  const id = req.params.statusId;
     Status.remove({ _id: id })
     .exec()
     .then(result => {

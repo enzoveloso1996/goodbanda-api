@@ -7,7 +7,7 @@ const Booking = require("../models/booking");
 //general get
 router.get('/', (req, res, next) => {
     Booking.find()
-    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId bookingId")
+    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId _id")
     .exec()
     .then(docs => {
       const response = {
@@ -31,10 +31,10 @@ router.get('/', (req, res, next) => {
             parcelDesc: doc.parcelDesc,
             parcelWeight: doc.parcelWeight,
             userId: doc.userId,
-            bookingId: doc.bookingId,
+            _id: doc._id,
             request: {
               type: "GET",
-              url: "http://localhost:3000/bookings/" + doc.bookingId
+              url: "http://localhost:3000/bookings/" + doc._id
             }
           };
         })
@@ -52,7 +52,7 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const booking = new Booking({
-        bookingId: new mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         userId: req.body.userId,
         parcelWeight: req.body.parcelWeight,
         parcelDesc: req.body.parcelDesc,
@@ -91,7 +91,7 @@ router.post('/', (req, res, next) => {
 router.get('/:bookingId', (req, res, next) => {
     const id = req.params.bookingId;
     Booking.findById(id)
-    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId bookingId")
+    .select("createdAt receiverContact receiverName riderId statusId rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight userId _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -118,11 +118,7 @@ router.get('/:bookingId', (req, res, next) => {
 //update
 router.patch('/:bookingId', (req, res, next) => {
     const id = req.params.bookingId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    Booking.update({ bookingId: id }, { $set: updateOps })
+    Booking.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -143,7 +139,8 @@ router.patch('/:bookingId', (req, res, next) => {
 
 //delete
 router.delete('/:bookingId', (req, res, next) => {
-    Booking.remove({ bookingId: id })
+  const id = req.params.bookingId;
+    Booking.remove({ _id: id })
     .exec()
     .then(result => {
       res.status(200).json({

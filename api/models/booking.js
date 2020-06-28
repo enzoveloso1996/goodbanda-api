@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const bookingSchema = mongoose.Schema({
-    bookingId: mongoose.Schema.Types.ObjectId,
+    _id: mongoose.Schema.Types.ObjectId,
+    userId: [
+      {type: mongoose.Types.ObjectId, ref: 'User', required: true}
+    ],
     parcelWeight: { type: Number, required: false },
     parcelDesc: { type:String, required: true },
     specialInstructions: { type:String, required: false },

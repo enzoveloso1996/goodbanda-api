@@ -7,7 +7,7 @@ const Rider = require("../models/rider");
 //general get
 router.get('/', (req, res, next) => {
     Rider.find()
-    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName riderId")
+    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName _id")
     .exec()
     .then(docs => {
       const response = {
@@ -27,10 +27,10 @@ router.get('/', (req, res, next) => {
             lastName: doc.lastName,
             middleName: doc.middleName,
             firstName: doc.firstName,
-            riderId: doc.riderId,
+            _id: doc._id,
             request: {
               type: "GET",
-              url: "http://localhost:3000/riders/" + doc.riderId
+              url: "http://localhost:3000/riders/" + doc._id
             }
           };
         })
@@ -48,7 +48,7 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const rider = new Rider({
-        riderId: new mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         firstName: req.body.firstName,
         middleName: req.body.middleName,
         lastName: req.body.lastName,
@@ -59,7 +59,7 @@ router.post('/', (req, res, next) => {
         currentLat: req.body.currentLat,
         currentLong: req.body.currentLong,
         loadBalance: req.body.loadBalance,
-        contactNumber: req.body.loadBalance,
+        contactNumber: req.body.contactNumber,
         gems: req.body.gems,
     });
     rider
@@ -83,7 +83,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderId', (req, res, next) => {
     const id = req.params.riderId;
     Rider.findById(id)
-    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName riderId")
+    .select("createdAt gems contactNumber loadBalance currentLong currentLat isAvailable address email password lastName middleName firstName _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -110,11 +110,7 @@ router.get('/:riderId', (req, res, next) => {
 //update
 router.patch('/:riderId', (req, res, next) => {
     const id = req.params.riderId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    Rider.update({ riderId: id }, { $set: updateOps })
+    Rider.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -135,7 +131,8 @@ router.patch('/:riderId', (req, res, next) => {
 
 //delete
 router.delete('/:riderId', (req, res, next) => {
-    Rider.remove({ riderId: id })
+  const id = req.params.riderId;
+    Rider.remove({ _id: id })
     .exec()
     .then(result => {
       res.status(200).json({

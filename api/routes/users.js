@@ -7,7 +7,7 @@ const User = require("../models/user");
 //general get
 router.get('/', (req, res, next) => {
     User.find()
-    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName userId")
+    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName _id")
     .exec()
     .then(docs => {
       const response = {
@@ -25,10 +25,10 @@ router.get('/', (req, res, next) => {
             lastName: doc.lastName,
             middleName: doc.middleName,
             firstName: doc.firstName,
-            userId: doc.userId,
+            _id: doc._id,
             request: {
               type: "GET",
-              url: "http://localhost:3000/users/" + doc.userId
+              url: "http://localhost:3000/users/" + doc._id
             }
           };
         })
@@ -46,7 +46,7 @@ router.get('/', (req, res, next) => {
 //create
 router.post('/', (req, res, next) => {
     const user = new User({
-        userId: new mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         firstName: req.body.firstName,
         middleName: req.body.middleName,
         lastName: req.body.lastName,
@@ -79,7 +79,7 @@ router.post('/', (req, res, next) => {
 router.get('/:userId', (req, res, next) => {
     const id = req.params.userId;
     User.findById(id)
-    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName userId")
+    .select("createdAt loadBalance currentLong currentLat address email contactNumber password lastName middleName firstName _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);
@@ -106,11 +106,7 @@ router.get('/:userId', (req, res, next) => {
 //update
 router.patch('/:userId', (req, res, next) => {
     const id = req.params.userId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    User.update({ userId: id }, { $set: updateOps })
+    User.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -131,7 +127,8 @@ router.patch('/:userId', (req, res, next) => {
 
 //delete
 router.delete('/:userId', (req, res, next) => {
-    User.remove({ userId: id })
+  const id = req.params.userId;
+    User.remove({ _id: id })
     .exec()
     .then(result => {
       res.status(200).json({

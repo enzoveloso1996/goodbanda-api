@@ -89,11 +89,7 @@ router.get('/:rateId', (req, res, next) => {
 //update
 router.patch('/:rateId', (req, res, next) => {
     const id = req.params.rateId;
-    const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
-    }
-    Rate.update({ _id: id }, { $set: updateOps })
+    Rate.updateMany({_id: id}, {$set: req.body})
         .exec()
         .then(result => {
         res.status(200).json({
@@ -114,6 +110,7 @@ router.patch('/:rateId', (req, res, next) => {
 
 //delete
 router.delete('/:rateId', (req, res, next) => {
+  const id = req.params.rateId;
     Rate.remove({ _id: id })
     .exec()
     .then(result => {

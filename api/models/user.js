@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
+    _id: mongoose.Schema.Types.ObjectId,
     firstName: { type: String, required: true },
     middleName: { type: String, required: false },
     lastName: { type: String, required: true },
@@ -11,7 +11,7 @@ const userSchema = mongoose.Schema({
     address: { type: String, required: true },
     currentLat: { type: Number, required: false },
     currentLong: { type: Number, required: false },
-    loadBalance: { type: Number, required: true },
+    loadBalance: { type: Number, required: false },
     createdAt: { type: Date, default: Date.now }
 });
 
