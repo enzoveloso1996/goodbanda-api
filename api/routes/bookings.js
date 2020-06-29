@@ -3,12 +3,17 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const Booking = require("../models/booking");
-
+const User = require("../models/user");
+const Rider = require("../models/rider");
+const Status = require("../models/status");
 
 //general get
 router.get('/', (req, res, next) => {
     Booking.find()
     .select("createdAt receiverContact receiverName rider status rate distance dropoffAddress dropoffLong dropoffLat pickupAddress pickupLong pickupLat specialInstructions parcelDesc parcelWeight user _id")
+    .populate('user')
+    .populate('rider',)
+    .populate('status', 'status')
     .exec()
     .then(docs => {
       const response = {
@@ -52,25 +57,49 @@ router.get('/', (req, res, next) => {
 
 //create
 router.post('/', (req, res, next) => {
+    User.findById(req.body.userId)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+    })
+    Rider.findById(req.body.riderId)
+    .then(rider => {
+      if (!rider) {
+        return res.status(404).json({
+          message: "Rider not found"
+        });
+      }
+    })
+    Status.findById(req.body.statusId)
+    .then(status => {
+      if (!status) {
+        return res.status(404).json({
+          message: "Status not found"
+        });
+      }
+    })
     const booking = new Booking({
-        _id: new mongoose.Types.ObjectId(),
-        user: req.body.userId,
-        parcelWeight: req.body.parcelWeight,
-        parcelDesc: req.body.parcelDesc,
-        specialInstructions: req.body.specialInstructions,
-        pickupLat: req.body.pickupLat,
-        pickupLong: req.body.pickupLong,
-        pickupAddress: req.body.pickupAddress,
-        dropoffLat: req.body.dropoffLat,
-        dropoffLong: req.body.dropoffLong,
-        dropoffAddress: req.body.dropoffAddress,
-        distance: req.body.distance,
-        rate: req.body.rate,
-        status: req.body.statusId,
-        rider: req.body.riderId,
-        receiverName: req.body.receiverName,
-        receiverContact: req.body.receiverContact,
-    });
+          _id: new mongoose.Types.ObjectId(),
+          user: req.body.userId,
+          parcelWeight: req.body.parcelWeight,
+          parcelDesc: req.body.parcelDesc,
+          specialInstructions: req.body.specialInstructions,
+          pickupLat: req.body.pickupLat,
+          pickupLong: req.body.pickupLong,
+          pickupAddress: req.body.pickupAddress,
+          dropoffLat: req.body.dropoffLat,
+          dropoffLong: req.body.dropoffLong,
+          dropoffAddress: req.body.dropoffAddress,
+          distance: req.body.distance,
+          rate: req.body.rate,
+          status: req.body.statusId,
+          rider: req.body.riderId,
+          receiverName: req.body.receiverName,
+          receiverContact: req.body.receiverContact,
+      });
     booking
     .save()
     .then(result => {

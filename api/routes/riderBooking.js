@@ -3,11 +3,15 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const RiderBooking = require("../models/riderBooking");
+const Rider = require("../models/rider");
+const Booking = require("../models/booking");
 
 //general get
 router.get('/', (req, res, next) => {
     RiderBooking.find()
-    .select("createdAt gemEarned deduction earned rate booking user rider _id")
+    .select("createdAt gemEarned deduction earned rate booking rider _id")
+    .populate('rider', '_Id')
+    .populate('booking')
     .exec()
     .then(docs => {
       const response = {
@@ -20,7 +24,6 @@ router.get('/', (req, res, next) => {
             earned: doc.earned,
             rate: doc.rate,
             booking: doc.booking,
-            user: doc.user,
             rider: doc.rider,
             _id: doc._id,
             request: {
@@ -42,10 +45,25 @@ router.get('/', (req, res, next) => {
 
 //create
 router.post('/', (req, res, next) => {
+    Rider.findById(req.body.riderId)
+    .then(rider => {
+      if (!rider) {
+        return res.status(404).json({
+          message: "Rider not found"
+        });
+      }
+    })
+    Booking.findById(req.body.bookingId)
+    .then(booking => {
+      if (!booking) {
+        return res.status(404).json({
+          message: "Booking not found"
+        });
+      }
+    })
     const riderBooking = new RiderBooking({
         _id: new mongoose.Types.ObjectId(),
         rider: req.body.riderId,
-        user: req.body.userId,
         booking: req.body.bookingId,
         rate: req.body.rate,
         earned: req.body.earned,
@@ -73,7 +91,7 @@ router.post('/', (req, res, next) => {
 router.get('/:riderBookingId', (req, res, next) => {
     const id = req.params.riderBookingId;
     Booking.findById(id)
-    .select("createdAt gemEarned deduction earned rate booking user rider _id")
+    .select("createdAt gemEarned deduction earned rate booking rider _id")
     .exec()
     .then(doc => {
       console.log("From database", doc);

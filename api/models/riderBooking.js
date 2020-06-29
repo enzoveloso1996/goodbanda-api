@@ -6,9 +6,6 @@ const riderBookingSchema = mongoose.Schema({
     rider: [
       {type: mongoose.Types.ObjectId, ref: 'Rider', required: true}
     ],
-    user: [
-      {type: mongoose.Types.ObjectId, ref: 'User', required: true}
-    ],
     booking: [
       {type: mongoose.Types.ObjectId, ref: 'Booking', required: true}
     ],
